@@ -12,16 +12,19 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Planificación del día"),
+        title: const Text("Planificación de hoy"),
         actions: [
           IconButton(onPressed: (){}, icon: const Icon(Icons.calendar_month_outlined)),
           IconButton(onPressed: (){}, icon: const Icon(Icons.filter_list_rounded)),
           IconButton(onPressed: (){}, icon: const Icon(Icons.search)),
         ],
       ),
-      body: const _HomeView(),
+      body: 
+          const _HomeView(),
+
     );
   }
 }
@@ -52,12 +55,28 @@ class _CustomListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    final textStyle = Theme.of(context).textTheme;
     
     return ListTile(
       leading: Icon(appointment.icon, color: colors.primary,),
-      trailing: Icon(Icons.arrow_forward_ios_rounded, color: colors.primary,),
+      trailing: SizedBox(
+        width: 110,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(appointment.time, style: textStyle.titleMedium,),
+            Icon(Icons.arrow_forward_ios_rounded, color: colors.primary,)
+          ],
+        ),
+      ),
       title: Text(appointment.title),
-      subtitle: Text(appointment.subtitle),
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(appointment.subtitle),
+          Text(appointment.patientName),
+        ],
+      ),
       onTap: (){
         context.push('/appointment/${appointment.link}');
       },  
