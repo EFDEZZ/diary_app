@@ -1,4 +1,6 @@
 import 'package:diary_app/domain/entities/appointment.dart';
+import 'package:diary_app/presentation/buttons/buttons.dart';
+import 'package:diary_app/presentation/buttons/filter_button.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -17,8 +19,8 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: const Text("Planificación de hoy"),
         actions: [
-          IconButton(onPressed: (){}, icon: const Icon(Icons.calendar_month_outlined)),
-          IconButton(onPressed: (){}, icon: const Icon(Icons.filter_list_rounded)),
+          const CalendarButton(),
+          const FilterButton(),
           IconButton(onPressed: (){}, icon: const Icon(Icons.search)),
         ],
       ),
