@@ -23,7 +23,7 @@ class Appointment {
       });
       
 String get formattedDate => DateFormat('dd-MM-yyyy').format(date);
-String get formattedmonth => DateFormat('EEE, M/d/y').format(date);
+String get formattedmonth => DateFormat('EEE, M/d/y', 'es_ES').format(date);
 }
 // Codigo provisional (Solo para design)
 

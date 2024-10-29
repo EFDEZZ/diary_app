@@ -169,10 +169,10 @@ class _AppointmentDetailView extends StatelessWidget {
           const SizedBox(
             height: 15,
           ),
-          FilledButton(
+          FilledButton.tonal(
               onPressed: () {},
               child: const SizedBox(
-                width: 60,
+                width: 150,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -180,7 +180,7 @@ class _AppointmentDetailView extends StatelessWidget {
                     SizedBox(
                       width: 5,
                     ),
-                    Text("HCE")
+                    Text("HCE del Paciente")
                   ],
                 ),
               ))
