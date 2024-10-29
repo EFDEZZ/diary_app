@@ -18,10 +18,10 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Planificación de hoy"),
-        actions: [
-          const CalendarButton(),
-          const FilterButton(),
-          IconButton(onPressed: (){}, icon: const Icon(Icons.search)),
+        actions: const  [
+          CalendarButton(),
+          FilterButton(),
+
         ],
       ),
       body: 
