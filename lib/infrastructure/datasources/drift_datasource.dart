@@ -1,8 +1,8 @@
-import 'package:diary_app/domain/datasources/activities_datasource.dart';
+import 'package:diary_app/domain/datasources/local_storage_datasource.dart';
 import 'package:diary_app/domain/entities/activity.dart';
 import 'package:diary_app/domain/entities/electronic_medical_record.dart';
 
-class LocalDatasource extends ActivitiesDatasource{
+class DriftDatasource extends LocalStorageDatasource{
   @override
   Future<ElectronicMedicalRecord> accessPatientHCE(int patientId) {
     // TODO: implement accessPatientHCE
