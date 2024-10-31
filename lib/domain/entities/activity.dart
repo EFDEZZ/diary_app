@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-class Appointment {
+class Activity {
   final String title;
   final String subtitle;
   final String link;
@@ -11,7 +11,7 @@ class Appointment {
   final String time;
   final IconData icon;
 
-  Appointment({
+  Activity({
     required this.time,
     required this.date, 
     required this.title,
@@ -27,8 +27,8 @@ String get formattedmonth => DateFormat('EEE, M/d/y', 'es_ES').format(date);
 }
 // Codigo provisional (Solo para design)
 
-List<Appointment> appointments = [
-  Appointment(
+List<Activity> activities = [
+  Activity(
   title: 'Consulta General',
   subtitle: 'Chequeo Anual',
   date: DateTime.parse("2024-02-27"),
@@ -39,7 +39,7 @@ List<Appointment> appointments = [
   icon: Icons.assignment_outlined
 ),
 
-Appointment(
+Activity(
   title: 'Consulta Pediátrica',
   subtitle: 'Revisión de Rutina',
   date: DateTime(2024, 10, 6,),
@@ -50,7 +50,7 @@ Appointment(
   icon: Icons.assignment_outlined  
 ),
 
-Appointment(
+Activity(
   title: 'Consulta Cardiológica',
   subtitle: 'Evaluación de Presión',
   date: DateTime(2024, 10, 7),
@@ -61,7 +61,7 @@ Appointment(
   icon: Icons.assignment_outlined
 ),
 
-Appointment(
+Activity(
   title: 'Consulta Dermatológica',
   subtitle: 'Examen de Lunares',
   date: DateTime(2024, 10, 8),
@@ -72,7 +72,7 @@ Appointment(
   icon: Icons.assignment_outlined
 ),
 
-Appointment(
+Activity(
   title: 'Consulta Oftalmológica',
   subtitle: 'Revisión de la Vista',
   date: DateTime(2024, 10, 9),

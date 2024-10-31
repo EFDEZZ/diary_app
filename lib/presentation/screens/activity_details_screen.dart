@@ -1,9 +1,9 @@
-import 'package:diary_app/domain/entities/appointment.dart';
+import 'package:diary_app/domain/entities/activity.dart';
 import 'package:flutter/material.dart';
 
-class AppointmentDetailsScreen extends StatelessWidget {
-  final Appointment appointment;
-  const AppointmentDetailsScreen({super.key, required this.appointment});
+class ActivityDetailsScreen extends StatelessWidget {
+  final Activity activities;
+  const ActivityDetailsScreen({super.key, required this.activities});
 
   @override
   Widget build(BuildContext context) {
@@ -13,19 +13,19 @@ class AppointmentDetailsScreen extends StatelessWidget {
         backgroundColor: Colors.white,
         title: const Text("Detalles de la Cita"),
       ),
-      body: _AppointmentDetailView(
-          appointment: appointment, textStyle: textStyle),
+      body: _ActivityDetailView(
+          activities: activities, textStyle: textStyle),
     );
   }
 }
 
-class _AppointmentDetailView extends StatelessWidget {
-  const _AppointmentDetailView({
-    required this.appointment,
+class _ActivityDetailView extends StatelessWidget {
+  const _ActivityDetailView({
+    required this.activities,
     required this.textStyle,
   });
 
-  final Appointment appointment;
+  final Activity activities;
   final TextTheme textStyle;
 
   @override
@@ -57,7 +57,7 @@ class _AppointmentDetailView extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Text(
-                  appointment.title,
+                  activities.title,
                   style: textStyle.titleLarge,
                 ),
                 const SizedBox(
@@ -70,7 +70,7 @@ class _AppointmentDetailView extends StatelessWidget {
                       width: 10,
                     ),
                     Text(
-                      appointment.subtitle,
+                      activities.subtitle,
                       style: textStyle.bodyLarge,
                     ),
                   ],
@@ -85,7 +85,7 @@ class _AppointmentDetailView extends StatelessWidget {
                       width: 10,
                     ),
                     Text(
-                      appointment.patientName,
+                      activities.patientName,
                       style: textStyle.bodyLarge,
                     ),
                   ],
@@ -100,7 +100,7 @@ class _AppointmentDetailView extends StatelessWidget {
                       width: 10,
                     ),
                     Text(
-                      appointment.formattedmonth,
+                      activities.formattedmonth,
                       style: textStyle.bodyLarge,
                     ),
                   ],
@@ -115,7 +115,7 @@ class _AppointmentDetailView extends StatelessWidget {
                       width: 10,
                     ),
                     Text(
-                      appointment.time,
+                      activities.time,
                       style: textStyle.bodyLarge,
                     ),
                   ],
@@ -156,7 +156,7 @@ class _AppointmentDetailView extends StatelessWidget {
                     height: 10,
                   ),
                   Text(
-                    appointment.description,
+                    activities.description,
                     style: textStyle.bodyLarge,
                   ),
                   const SizedBox(
