@@ -11,13 +11,13 @@ final appRouter = GoRouter(
       path: '/',
       builder: (context, state) => const HomePage(),
       ),
-    GoRoute(
-      path: '/activity/:link',
-      builder: (context, state) {
-        final link = state.pathParameters['link']!;
-        final activity = activities.firstWhere((appt) => appt.link == link);
-        return ActivityDetailsScreen(activities: activity,);
-      },
-      ),
+    // GoRoute(
+    //   path: '/activity/:link',
+    //   builder: (context, state) {
+    //     final link = state.pathParameters['link']!;
+    //     final activity = activities.firstWhere((appt) => appt.link == link);
+    //     return ActivityDetailsScreen(activities: activity,);
+    //   },
+    //   ),
   ]
   );
