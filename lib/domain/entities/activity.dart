@@ -11,24 +11,37 @@ class Activity {
   final String area;
   final String consultType;
 
-  
-
   Activity({
     required this.time,
-    required this.date, 
+    required this.date,
     required this.title,
     required this.subtitle,
     required this.id,
     required this.patientName,
     required this.description,
-    required this.area, 
-    required this.consultType, 
+    required this.area,
+    required this.consultType,
+  });
 
-      });
-      
-String get formattedDate => DateFormat('dd-MM-yyyy').format(date);
-String get formattedmonth => DateFormat('EEE, M/d/y', 'es_ES').format(date);
+  String get formattedDate => DateFormat('dd-MM-yyyy').format(date);
+  String get formattedmonth => DateFormat('EEE, M/d/y', 'es_ES').format(date);
+
+  factory Activity.fromDb(Activity dbActivity) {
+    return Activity(
+      id: dbActivity.id,
+      title: dbActivity.title,
+      subtitle: dbActivity.subtitle,
+      patientName: dbActivity.patientName,
+      description: dbActivity.description,
+      date: dbActivity.date,
+      time: dbActivity.time,
+      area: dbActivity.area,
+      consultType: dbActivity.consultType,
+    );
+  }
 }
+
+
 // // Codigo provisional (Solo para design)
 
 // List<Activity> activities = [

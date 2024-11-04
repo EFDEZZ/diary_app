@@ -20,14 +20,15 @@ class ActivityDetailsScreen extends StatelessWidget {
 }
 
 class _ActivityDetailView extends StatelessWidget {
-  const _ActivityDetailView({
-    required this.activities,
-    required this.textStyle,
-  });
 
   final Activity activities;
   final TextTheme textStyle;
 
+  const _ActivityDetailView({
+    required this.activities,
+    required this.textStyle,
+  });
+  
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(

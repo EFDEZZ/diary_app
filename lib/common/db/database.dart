@@ -1,18 +1,13 @@
-// database.dart
-
 import 'dart:io';
-
 import 'package:diary_app/infrastructure/datasources/local/entities/activity_db.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 
-
 part 'database.g.dart';
 
-
-@DriftDatabase(tables: [ActivityDb])
+@DriftDatabase(tables: [ActivityDb], daos: [ActivityDao])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
@@ -27,6 +22,20 @@ class AppDatabase extends _$AppDatabase {
     });
   }
 }
+
+@DriftAccessor(tables: [ActivityDb])
+class ActivityDao extends DatabaseAccessor<AppDatabase> with _$ActivityDaoMixin {
+  final AppDatabase db;
+
+  ActivityDao(this.db) : super(db);
+
+  Future<List<Activity>> getAllActivities() => select(activityDb).get();
+
+  Future<Activity?> getActivityById(String id) {
+    return (select(activityDb)..where((tbl) => tbl.id.equals(id))).getSingleOrNull();
+  }
+}
+
 
 
 Future<void> insertHospitalActivities(AppDatabase db) async {

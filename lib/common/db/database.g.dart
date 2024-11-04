@@ -479,6 +479,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $ActivityDbTable activityDb = $ActivityDbTable(this);
+  late final ActivityDao activityDao = ActivityDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -717,4 +718,8 @@ class $AppDatabaseManager {
   $AppDatabaseManager(this._db);
   $$ActivityDbTableTableManager get activityDb =>
       $$ActivityDbTableTableManager(_db, _db.activityDb);
+}
+
+mixin _$ActivityDaoMixin on DatabaseAccessor<AppDatabase> {
+  $ActivityDbTable get activityDb => attachedDatabase.activityDb;
 }

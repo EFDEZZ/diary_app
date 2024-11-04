@@ -1,47 +1,60 @@
-import 'package:diary_app/domain/entities/activity.dart';
-import 'package:diary_app/presentation/buttons/buttons.dart';
-import 'package:diary_app/presentation/buttons/filter_button.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:diary_app/common/db/database.dart';
+import 'package:diary_app/presentation/buttons/buttons.dart';
+import 'package:diary_app/presentation/buttons/filter_button.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class HomeScreen extends StatefulWidget {
+  final AppDatabase database;
+
+  const HomeScreen({super.key, required this.database});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         title: const Text("Planificación de hoy"),
-        actions: const  [
+        actions: const [
           CalendarButton(),
           FilterButton(),
-
         ],
       ),
-      body: 
-          const _HomeView(),
-
+      body: _HomeView(database: widget.database),
     );
   }
 }
 
 class _HomeView extends StatelessWidget {
-  const _HomeView();
-  
+  final AppDatabase database;
+
+  const _HomeView({required this.database});
+
   @override
   Widget build(BuildContext context) {
-
-    return ListView.builder(
-      itemCount: activities.length,
-      itemBuilder: (context, index) {
-        final activity = activities[index];
-        return _CustomListTile(activity: activity);
+    return FutureBuilder<List<Activity>>(
+      future: database.activityDao.getAllActivities(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return const Center(child: Text('No hay actividades disponibles'));
+        } else {
+          final activities = snapshot.data!;
+          return ListView.builder(
+            itemCount: activities.length,
+            itemBuilder: (context, index) {
+              final activity = activities[index];
+              return _CustomListTile(activity: activity);
+            },
+          );
+        }
       },
     );
   }
@@ -58,16 +71,16 @@ class _CustomListTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final textStyle = Theme.of(context).textTheme;
-    
+
     return ListTile(
-      leading: Icon(activity.icon, color: colors.primary,),
+      leading: Icon(Icons.calendar_today, color: colors.primary),
       trailing: SizedBox(
         width: 110,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(activity.time, style: textStyle.titleMedium,),
-            Icon(Icons.arrow_forward_ios_rounded, color: colors.primary,)
+            Text(activity.time, style: textStyle.titleMedium),
+            Icon(Icons.arrow_forward_ios_rounded, color: colors.primary),
           ],
         ),
       ),
@@ -79,9 +92,9 @@ class _CustomListTile extends StatelessWidget {
           Text(activity.patientName),
         ],
       ),
-      onTap: (){
-        context.push('/activity/${activity.link}');
-      },  
+      onTap: () {
+        context.push('/activity/${activity.id}');
+      },
     );
   }
 }
