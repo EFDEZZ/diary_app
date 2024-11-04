@@ -1,3 +1,4 @@
+import 'package:diary_app/common/db/database.dart';
 import 'package:intl/intl.dart';
 
 class Activity {
@@ -26,17 +27,17 @@ class Activity {
   String get formattedDate => DateFormat('dd-MM-yyyy').format(date);
   String get formattedmonth => DateFormat('EEE, M/d/y', 'es_ES').format(date);
 
-  factory Activity.fromDb(Activity dbActivity) {
+  factory Activity.fromDb(ActivityDB dbData) {
     return Activity(
-      id: dbActivity.id,
-      title: dbActivity.title,
-      subtitle: dbActivity.subtitle,
-      patientName: dbActivity.patientName,
-      description: dbActivity.description,
-      date: dbActivity.date,
-      time: dbActivity.time,
-      area: dbActivity.area,
-      consultType: dbActivity.consultType,
+      id: dbData.id,
+      title: dbData.title,
+      subtitle: dbData.subtitle,
+      patientName: dbData.patientName,
+      description: dbData.description,
+      date: dbData.date,
+      time: dbData.time,
+      area: dbData.area,
+      consultType: dbData.consultType,
     );
   }
 }

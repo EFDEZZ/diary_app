@@ -36,7 +36,7 @@ class _HomeView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<Activity>>(
+    return FutureBuilder<List<ActivityDB>>(
       future: database.activityDao.getAllActivities(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -65,7 +65,7 @@ class _CustomListTile extends StatelessWidget {
     required this.activity,
   });
 
-  final Activity activity;
+  final ActivityDB activity;
 
   @override
   Widget build(BuildContext context) {

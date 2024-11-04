@@ -2,7 +2,7 @@
 import 'package:drift/drift.dart';
 
 
-@DataClassName('Activity')
+@DataClassName('ActivityDB')
 class ActivityDb extends Table {
   TextColumn get id => text()();
   TextColumn get title => text()();

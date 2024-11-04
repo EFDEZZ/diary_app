@@ -4,7 +4,7 @@ part of 'database.dart';
 
 // ignore_for_file: type=lint
 class $ActivityDbTable extends ActivityDb
-    with TableInfo<$ActivityDbTable, Activity> {
+    with TableInfo<$ActivityDbTable, ActivityDB> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -76,7 +76,7 @@ class $ActivityDbTable extends ActivityDb
   String get actualTableName => $name;
   static const String $name = 'activity_db';
   @override
-  VerificationContext validateIntegrity(Insertable<Activity> instance,
+  VerificationContext validateIntegrity(Insertable<ActivityDB> instance,
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
@@ -145,9 +145,9 @@ class $ActivityDbTable extends ActivityDb
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  Activity map(Map<String, dynamic> data, {String? tablePrefix}) {
+  ActivityDB map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return Activity(
+    return ActivityDB(
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
       title: attachedDatabase.typeMapping
@@ -175,7 +175,7 @@ class $ActivityDbTable extends ActivityDb
   }
 }
 
-class Activity extends DataClass implements Insertable<Activity> {
+class ActivityDB extends DataClass implements Insertable<ActivityDB> {
   final String id;
   final String title;
   final String subtitle;
@@ -185,7 +185,7 @@ class Activity extends DataClass implements Insertable<Activity> {
   final String time;
   final String area;
   final String consultType;
-  const Activity(
+  const ActivityDB(
       {required this.id,
       required this.title,
       required this.subtitle,
@@ -224,10 +224,10 @@ class Activity extends DataClass implements Insertable<Activity> {
     );
   }
 
-  factory Activity.fromJson(Map<String, dynamic> json,
+  factory ActivityDB.fromJson(Map<String, dynamic> json,
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return Activity(
+    return ActivityDB(
       id: serializer.fromJson<String>(json['id']),
       title: serializer.fromJson<String>(json['title']),
       subtitle: serializer.fromJson<String>(json['subtitle']),
@@ -255,7 +255,7 @@ class Activity extends DataClass implements Insertable<Activity> {
     };
   }
 
-  Activity copyWith(
+  ActivityDB copyWith(
           {String? id,
           String? title,
           String? subtitle,
@@ -265,7 +265,7 @@ class Activity extends DataClass implements Insertable<Activity> {
           String? time,
           String? area,
           String? consultType}) =>
-      Activity(
+      ActivityDB(
         id: id ?? this.id,
         title: title ?? this.title,
         subtitle: subtitle ?? this.subtitle,
@@ -276,8 +276,8 @@ class Activity extends DataClass implements Insertable<Activity> {
         area: area ?? this.area,
         consultType: consultType ?? this.consultType,
       );
-  Activity copyWithCompanion(ActivityDbCompanion data) {
-    return Activity(
+  ActivityDB copyWithCompanion(ActivityDbCompanion data) {
+    return ActivityDB(
       id: data.id.present ? data.id.value : this.id,
       title: data.title.present ? data.title.value : this.title,
       subtitle: data.subtitle.present ? data.subtitle.value : this.subtitle,
@@ -295,7 +295,7 @@ class Activity extends DataClass implements Insertable<Activity> {
 
   @override
   String toString() {
-    return (StringBuffer('Activity(')
+    return (StringBuffer('ActivityDB(')
           ..write('id: $id, ')
           ..write('title: $title, ')
           ..write('subtitle: $subtitle, ')
@@ -315,7 +315,7 @@ class Activity extends DataClass implements Insertable<Activity> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is Activity &&
+      (other is ActivityDB &&
           other.id == this.id &&
           other.title == this.title &&
           other.subtitle == this.subtitle &&
@@ -327,7 +327,7 @@ class Activity extends DataClass implements Insertable<Activity> {
           other.consultType == this.consultType);
 }
 
-class ActivityDbCompanion extends UpdateCompanion<Activity> {
+class ActivityDbCompanion extends UpdateCompanion<ActivityDB> {
   final Value<String> id;
   final Value<String> title;
   final Value<String> subtitle;
@@ -370,7 +370,7 @@ class ActivityDbCompanion extends UpdateCompanion<Activity> {
         time = Value(time),
         area = Value(area),
         consultType = Value(consultType);
-  static Insertable<Activity> custom({
+  static Insertable<ActivityDB> custom({
     Expression<String>? id,
     Expression<String>? title,
     Expression<String>? subtitle,
@@ -626,14 +626,14 @@ class $$ActivityDbTableAnnotationComposer
 class $$ActivityDbTableTableManager extends RootTableManager<
     _$AppDatabase,
     $ActivityDbTable,
-    Activity,
+    ActivityDB,
     $$ActivityDbTableFilterComposer,
     $$ActivityDbTableOrderingComposer,
     $$ActivityDbTableAnnotationComposer,
     $$ActivityDbTableCreateCompanionBuilder,
     $$ActivityDbTableUpdateCompanionBuilder,
-    (Activity, BaseReferences<_$AppDatabase, $ActivityDbTable, Activity>),
-    Activity,
+    (ActivityDB, BaseReferences<_$AppDatabase, $ActivityDbTable, ActivityDB>),
+    ActivityDB,
     PrefetchHooks Function()> {
   $$ActivityDbTableTableManager(_$AppDatabase db, $ActivityDbTable table)
       : super(TableManagerState(
@@ -703,14 +703,14 @@ class $$ActivityDbTableTableManager extends RootTableManager<
 typedef $$ActivityDbTableProcessedTableManager = ProcessedTableManager<
     _$AppDatabase,
     $ActivityDbTable,
-    Activity,
+    ActivityDB,
     $$ActivityDbTableFilterComposer,
     $$ActivityDbTableOrderingComposer,
     $$ActivityDbTableAnnotationComposer,
     $$ActivityDbTableCreateCompanionBuilder,
     $$ActivityDbTableUpdateCompanionBuilder,
-    (Activity, BaseReferences<_$AppDatabase, $ActivityDbTable, Activity>),
-    Activity,
+    (ActivityDB, BaseReferences<_$AppDatabase, $ActivityDbTable, ActivityDB>),
+    ActivityDB,
     PrefetchHooks Function()>;
 
 class $AppDatabaseManager {

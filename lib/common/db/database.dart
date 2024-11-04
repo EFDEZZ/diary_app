@@ -29,9 +29,9 @@ class ActivityDao extends DatabaseAccessor<AppDatabase> with _$ActivityDaoMixin 
 
   ActivityDao(this.db) : super(db);
 
-  Future<List<Activity>> getAllActivities() => select(activityDb).get();
+  Future<List<ActivityDB>> getAllActivities() => select(activityDb).get();
 
-  Future<Activity?> getActivityById(String id) {
+  Future<ActivityDB?> getActivityById(String id) {
     return (select(activityDb)..where((tbl) => tbl.id.equals(id))).getSingleOrNull();
   }
 }
