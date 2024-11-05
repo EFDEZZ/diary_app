@@ -1,4 +1,3 @@
-import 'package:diary_app/common/db/database.dart';
 import 'package:intl/intl.dart';
 
 class Activity {
