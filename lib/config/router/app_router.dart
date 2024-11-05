@@ -1,18 +1,17 @@
-import 'package:diary_app/domain/entities/activity.dart';
-import 'package:diary_app/presentation/screens/activity_details_screen.dart';
 import 'package:diary_app/presentation/screens/screens.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:diary_app/common/db/database.dart'; // Importa tu base de datos
+import 'package:diary_app/common/db/database.dart';
+import 'package:diary_app/infrastructure/mappers/activity_mapper.dart'; 
 
-final AppDatabase database = AppDatabase(); // Crea una instancia de la base de datos
+final AppDatabase database = AppDatabase(); 
 
 final appRouter = GoRouter(
   initialLocation: '/',
   routes: [
     GoRoute(
       path: '/',
-      builder: (context, state) => HomeScreen(database: database), // Pasa la instancia de la base de datos
+      builder: (context, state) => HomeScreen(database: database), 
     ),
     GoRoute(
       path: '/activity/:id',
@@ -28,7 +27,7 @@ final appRouter = GoRouter(
             } else if (!snapshot.hasData) {
               return const Center(child: Text('No se encontró la actividad.'));
             } else {
-              final activity = Activity.fromDb(snapshot.data!);
+              final activity = ActivityMapper.activityDbToActivity(snapshot.data!);
               return ActivityDetailsScreen(activities: activity);
             }
           },

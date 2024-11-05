@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:diary_app/common/db/database.dart';
 import 'package:diary_app/presentation/buttons/buttons.dart';
 import 'package:diary_app/presentation/buttons/filter_button.dart';
+import 'package:diary_app/domain/entities/activity.dart';
+import 'package:diary_app/infrastructure/mappers/activity_mapper.dart'; 
 
 class HomeScreen extends StatefulWidget {
   final AppDatabase database;
@@ -46,7 +48,9 @@ class _HomeView extends StatelessWidget {
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
           return const Center(child: Text('No hay actividades disponibles'));
         } else {
-          final activities = snapshot.data!;
+          final activities = snapshot.data!
+              .map((dbData) => ActivityMapper.activityDbToActivity(dbData))
+              .toList();
           return ListView.builder(
             itemCount: activities.length,
             itemBuilder: (context, index) {
@@ -65,7 +69,7 @@ class _CustomListTile extends StatelessWidget {
     required this.activity,
   });
 
-  final ActivityDB activity;
+  final Activity activity; // Uso de la clase Activity
 
   @override
   Widget build(BuildContext context) {
