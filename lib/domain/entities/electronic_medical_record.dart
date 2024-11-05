@@ -1,5 +1,5 @@
 class ElectronicMedicalRecord {
-  final int patientId;
+  final int ci;
   final String patientName;
   final DateTime dateOfBirth;
   final String gender;
@@ -11,7 +11,7 @@ class ElectronicMedicalRecord {
   final String hospitalizations;
 
   ElectronicMedicalRecord({
-    required this.patientId,
+    required this.ci,
     required this.patientName,
     required this.dateOfBirth,
     required this.gender,
