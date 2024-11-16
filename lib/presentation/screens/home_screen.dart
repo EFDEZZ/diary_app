@@ -16,9 +16,15 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  String selectedFilter = 'Hoy'; // Filtro inicial
-  DateTimeRange? selectedDateRange; // Rango de fechas seleccionado
+  String selectedFilter = 'Hoy';
+  DateTimeRange? selectedDateRange;
+  late   ExportLogic exportLogic;
 
+  @override
+  void initState() {
+    super.initState();
+    exportLogic = ExportLogic(widget.database);
+  }
   void _showFilterDialog() {
     showDialog(
       context: context,
@@ -41,6 +47,32 @@ class _HomeScreenState extends State<HomeScreen> {
       },
     );
   }
+  void _exportActivities() async {
+    try {
+      // Obtener las actividades filtradas
+      final activities = await exportLogic.getFilteredActivities(
+        selectedFilter: selectedFilter,
+        selectedDateRange: selectedDateRange,
+      );
+
+      // Exportar a .vcf
+      final filePath = await exportLogic.exportToVcf(activities);
+
+      if (filePath != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Archivo exportado a: $filePath')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Error al exportar el archivo.')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,19 +82,24 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.date_range_outlined),
-            onPressed: _showFilterDialog, // Muestra el diálogo de filtro
+            onPressed: _showFilterDialog,
           ),
-          const FilterButton(),
+          IconButton(
+            icon: const Icon(Icons.file_download),
+            onPressed: _exportActivities, // Llama al método de exportar
+          ),
         ],
       ),
       body: _HomeView(
         database: widget.database,
         filter: selectedFilter,
         dateRange: selectedDateRange,
+        exportLogic: exportLogic,
       ),
     );
   }
 }
+
 
 class _HomeView extends StatelessWidget {
   final AppDatabase database;
@@ -72,7 +109,7 @@ class _HomeView extends StatelessWidget {
   const _HomeView({
     required this.database,
     required this.filter,
-    required this.dateRange,
+    required this.dateRange, required ExportLogic exportLogic,
   });
 
   @override
