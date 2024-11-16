@@ -48,66 +48,90 @@ class ExportLogic {
     }
   }
 
-  /// Exportar actividades a un archivo .vcf en la carpeta Descargas
-  Future<String?> exportToVcf(List<Activity> activities) async {
-    // Solicitar permisos de almacenamiento
-    if (!await _requestStoragePermission()) {
-      print("Permiso de almacenamiento no concedido.");
-      return null;
+/// Exportar actividades a un archivo .vcf en la carpeta Descargas
+Future<String?> exportToVcf(List<Activity> activities) async {
+  // Solicitar permisos de almacenamiento
+  if (!await _requestStoragePermission()) {
+    print("Permiso de almacenamiento no concedido.");
+    return null;
+  }
+
+  try {
+    // Directorio de Descargas
+    final directory = Directory('/storage/emulated/0/Download');
+    if (!await directory.exists()) {
+      await directory.create(recursive: true);
     }
 
-    try {
-      // Directorio de Descargas
-      final directory = Directory('/storage/emulated/0/Download');
-      if (!await directory.exists()) {
-        await directory.create(recursive: true);
-      }
+    final filePath = '${directory.path}/planificacion.vcf';
+    final file = File(filePath);
 
-      final filePath = '${directory.path}/planificacion.vcf';
-      final file = File(filePath);
+    final sink = file.openWrite();
 
-      final sink = file.openWrite();
+    // Escribir el contenido del archivo .vcf
+    sink.writeln('BEGIN:VCALENDAR');
+    sink.writeln('VERSION:2.0');
+    sink.writeln('TZID:America/Havana');
 
-      // Escribir el contenido del archivo .vcf
-      sink.writeln('BEGIN:VCALENDAR');
-      sink.writeln('VERSION:2.0');
-      for (var activity in activities) {
-        final startDate = activity.date; // Fecha de inicio
-        final endDate =
-            startDate.add(const Duration(hours: 1)); // Duración predeterminada
+    for (var activity in activities) {
+      // Combinar fecha de actividad con la hora almacenada en `time`
+      final startDate = _combineDateAndTime(activity.date, activity.time);
+      final endDate = startDate.add(const Duration(hours: 1)); // Duración predeterminada
 
-        sink.writeln('BEGIN:VEVENT');
-        sink.writeln('SUMMARY:${activity.title}');
-        sink.writeln('DESCRIPTION:${activity.description}');
-        sink.writeln(
-            'DTSTART:${_formatDateTime(startDate)}'); // Usar la nueva lógica
-        sink.writeln(
-            'DTEND:${_formatDateTime(endDate)}'); // Usar la nueva lógica
-        sink.writeln('LOCATION:${activity.area}');
-        sink.writeln('STATUS:CONFIRMED');
-        sink.writeln('END:VEVENT');
-      }
-
-      sink.writeln('END:VCALENDAR');
-
-      await sink.flush();
-      await sink.close();
-
-      print("Archivo exportado en: $filePath");
-      return filePath;
-    } catch (e) {
-      print("Error al exportar archivo .vcf: $e");
-      return null;
+      sink.writeln('BEGIN:VEVENT');
+      sink.writeln('SUMMARY:${activity.title}');
+      sink.writeln('DESCRIPTION:${activity.description}');
+      sink.writeln('DTSTART;TZID=America/Havana:${_formatDateTime(startDate)}');
+      sink.writeln('DTEND;TZID=America/Havana:${_formatDateTime(endDate)}');
+      sink.writeln('LOCATION:${activity.area}');
+      sink.writeln('STATUS:CONFIRMED');
+      sink.writeln('END:VEVENT');
     }
-  }
 
-  /// Formatear fecha para vCard (ejemplo: 20231120T100000Z)
-  String _formatDateTime(DateTime dateTime) {
-    // Utilizar la hora local directamente
-    return '${dateTime.year}${_pad(dateTime.month)}${_pad(dateTime.day)}T${_pad(dateTime.hour)}${_pad(dateTime.minute)}00';
-  }
+    sink.writeln('END:VCALENDAR');
 
-  String _pad(int number) {
-    return number.toString().padLeft(2, '0');
+    await sink.flush();
+    await sink.close();
+
+    print("Archivo exportado en: $filePath");
+    return filePath;
+  } catch (e) {
+    print("Error al exportar archivo .vcf: $e");
+    return null;
   }
+}
+
+/// Combina la fecha y la hora almacenadas como `String` para formar un objeto DateTime
+DateTime _combineDateAndTime(DateTime date, String time) {
+  try {
+    final timeParts = time.split(' '); // Divide "10:00 AM" en ["10:00", "AM"]
+    final hourMinute = timeParts[0].split(':'); // Divide "10:00" en ["10", "00"]
+    int hour = int.parse(hourMinute[0]);
+    final minute = int.parse(hourMinute[1]);
+
+    // Ajusta la hora según AM/PM
+    if (timeParts[1].toUpperCase() == 'PM' && hour != 12) {
+      hour += 12;
+    } else if (timeParts[1].toUpperCase() == 'AM' && hour == 12) {
+      hour = 0;
+    }
+
+    // Combina la fecha y la hora
+    return DateTime(date.year, date.month, date.day, hour, minute);
+  } catch (e) {
+    print("Error al combinar fecha y hora: $e");
+    return date; // Devuelve solo la fecha si hay error
+  }
+}
+
+/// Formatear fecha para vCard (ejemplo: 20241115T100000)
+String _formatDateTime(DateTime dateTime) {
+  return '${dateTime.year}${_pad(dateTime.month)}${_pad(dateTime.day)}T${_pad(dateTime.hour)}${_pad(dateTime.minute)}00';
+}
+
+String _pad(int number) {
+  return number.toString().padLeft(2, '0');
+}
+
+
 }
