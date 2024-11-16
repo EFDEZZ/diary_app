@@ -85,7 +85,7 @@ class _HomeScreenState extends State<HomeScreen> {
             onPressed: _showFilterDialog,
           ),
           IconButton(
-            icon: const Icon(Icons.file_download),
+            icon: const Icon(Icons.file_download_outlined),
             onPressed: _exportActivities, // Llama al método de exportar
           ),
         ],
