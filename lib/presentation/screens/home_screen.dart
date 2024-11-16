@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:diary_app/common/db/database.dart';
 import 'package:diary_app/presentation/buttons/buttons.dart';
-import 'package:diary_app/presentation/buttons/filter_button.dart';
 import 'package:diary_app/domain/entities/activity.dart';
 import 'package:diary_app/infrastructure/mappers/activity_mapper.dart'; 
+
 
 class HomeScreen extends StatefulWidget {
   final AppDatabase database;
@@ -16,30 +16,81 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  String selectedFilter = 'Hoy'; // Filtro inicial
+  DateTimeRange? selectedDateRange; // Rango de fechas seleccionado
+
+  void _showFilterDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return DateFilterDialog(
+          currentFilter: selectedFilter,
+          selectedDateRange: selectedDateRange,
+          onFilterSelected: (filter) {
+            setState(() {
+              selectedFilter = filter;
+            });
+          },
+          onDateRangeSelected: (dateRange) {
+            setState(() {
+              selectedDateRange = dateRange;
+              selectedFilter = 'Rango de fechas'; // Cambia a "Rango de fechas"
+            });
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Planificación de hoy"),
-        actions: const [
-          CalendarButton(),
-          FilterButton(),
+        title: Text("Planificación de $selectedFilter"),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.date_range_outlined),
+            onPressed: _showFilterDialog, // Muestra el diálogo de filtro
+          ),
+          const FilterButton(),
         ],
       ),
-      body: _HomeView(database: widget.database),
+      body: _HomeView(
+        database: widget.database,
+        filter: selectedFilter,
+        dateRange: selectedDateRange,
+      ),
     );
   }
 }
 
 class _HomeView extends StatelessWidget {
   final AppDatabase database;
+  final String filter;
+  final DateTimeRange? dateRange;
 
-  const _HomeView({required this.database});
+  const _HomeView({
+    required this.database,
+    required this.filter,
+    required this.dateRange,
+  });
 
   @override
   Widget build(BuildContext context) {
+    Future<List<ActivityDB>> future;
+
+    if (filter == 'Hoy') {
+      future = database.activityDao.getAllActivitiesToday();
+    } else if (filter == 'Semana') {
+      future = database.activityDao.getAllActivitiesThisWeek();
+    } else if (filter == 'Rango de fechas' && dateRange != null) {
+      future = database.activityDao.getActivitiesInRange(dateRange!.start, dateRange!.end);
+    } else {
+      future = Future.value([]); // No hay actividades para mostrar
+    }
+
     return FutureBuilder<List<ActivityDB>>(
-      future: database.activityDao.getAllActivities(),
+      future: future,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
@@ -69,7 +120,7 @@ class _CustomListTile extends StatelessWidget {
     required this.activity,
   });
 
-  final Activity activity; // Uso de la clase Activity
+  final Activity activity;
 
   @override
   Widget build(BuildContext context) {
