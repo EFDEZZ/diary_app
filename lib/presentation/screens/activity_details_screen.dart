@@ -3,189 +3,188 @@ import 'package:flutter/material.dart';
 
 class ActivityDetailsScreen extends StatelessWidget {
   final Activity activities;
+
   const ActivityDetailsScreen({super.key, required this.activities});
 
   @override
   Widget build(BuildContext context) {
     final textStyle = Theme.of(context).textTheme;
+    final colors = Theme.of(context).colorScheme;
+
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        title: const Text("Detalles de la Cita"),
+        backgroundColor: const Color.fromARGB(255, 151, 200, 153),
+        title:  const Text("Detalles de la Cita", style: TextStyle(fontWeight: FontWeight.bold),),
       ),
       body: _ActivityDetailView(
-          activities: activities, textStyle: textStyle),
+        activities: activities,
+        textStyle: textStyle,
+        colors: colors,
+      ),
     );
   }
 }
 
 class _ActivityDetailView extends StatelessWidget {
-
   final Activity activities;
   final TextTheme textStyle;
+  final ColorScheme colors;
 
   const _ActivityDetailView({
     required this.activities,
     required this.textStyle,
+    required this.colors,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
+      padding: const EdgeInsets.all(16.0),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: double.infinity,
-            height: 200,
-            padding: const EdgeInsets.all(16.0),
-            margin: const EdgeInsets.only(top: 0),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: const BorderRadius.only(
-                  bottomLeft: Radius.circular(12),
-                  bottomRight: Radius.circular(12)),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.5),
-                  spreadRadius: 4,
-                  blurRadius: 5,
-                  offset: const Offset(0, 7),
-                ),
-              ],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Text(
-                  activities.title,
-                  style: textStyle.titleLarge,
-                ),
-                const SizedBox(
-                  height: 15,
-                ),
-                Row(
-                  children: [
-                    const Icon(Icons.text_snippet_rounded),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    Text(
-                      activities.subtitle,
-                      style: textStyle.bodyLarge,
-                    ),
-                  ],
-                ),
-                const SizedBox(
-                  height: 7,
-                ),
-                Row(
-                  children: [
-                    const Icon(Icons.person),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    Text(
-                      activities.patientName,
-                      style: textStyle.bodyLarge,
-                    ),
-                  ],
-                ),
-                const SizedBox(
-                  height: 7,
-                ),
-                Row(
-                  children: [
-                    const Icon(Icons.date_range_outlined),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    Text(
-                      activities.formattedmonth,
-                      style: textStyle.bodyLarge,
-                    ),
-                  ],
-                ),
-                const SizedBox(
-                  height: 7,
-                ),
-                Row(
-                  children: [
-                    const Icon(Icons.timer_outlined),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    Text(
-                      activities.time,
-                      style: textStyle.bodyLarge,
-                    ),
-                  ],
-                ),
-                const SizedBox(
-                  height: 7,
-                ),
-              ],
-            ),
+          _InfoCard(
+            title: activities.title,
+            details: [
+              _DetailRow(
+                icon: Icons.text_snippet_rounded,
+                label: activities.subtitle,
+                color: colors.primary,
+              ),
+              _DetailRow(
+                icon: Icons.person,
+                label: activities.patientName,
+                color: colors.primary,
+              ),
+              _DetailRow(
+                icon: Icons.date_range_outlined,
+                label: activities.formattedmonth,
+                color: colors.primary,
+              ),
+              _DetailRow(
+                icon: Icons.timer_outlined,
+                label: activities.time,
+                color: colors.primary,
+              ),
+            ],
           ),
-          Container(
-            width: double.infinity,
-            height: 400,
-            padding: const EdgeInsets.all(16.0),
-            margin: const EdgeInsets.only(top: 20),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: const BorderRadius.all(Radius.circular(12)),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.5),
-                  spreadRadius: 4,
-                  blurRadius: 5,
-                  offset: const Offset(0, 7),
-                ),
-              ],
-            ),
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.start,
+          const SizedBox(height: 20),
+          _DescriptionCard(
+            title: "Observaciones:",
+            description: activities.description,
+            textStyle: textStyle,
+          ),
+          const SizedBox(height: 20),
+          Center(
+            child: FilledButton.tonal(
+              onPressed: () {},
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    "Observaciones:",
-                    style: textStyle.titleLarge,
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  Text(
-                    activities.description,
-                    style: textStyle.bodyLarge,
-                  ),
-                  const SizedBox(
-                    height: 7,
-                  ),
+                  Icon(Icons.local_hospital),
+                  SizedBox(width: 5),
+                  Text("HCE del Paciente"),
                 ],
               ),
             ),
           ),
-          const SizedBox(
-            height: 15,
-          ),
-          FilledButton.tonal(
-              onPressed: () {},
-              child: const SizedBox(
-                width: 150,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.local_hospital),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    Text("HCE del Paciente")
-                  ],
-                ),
-              ))
         ],
+      ),
+    );
+  }
+}
+
+class _InfoCard extends StatelessWidget {
+  final String title;
+  final List<Widget> details;
+
+  const _InfoCard({
+    required this.title,
+    required this.details,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final textStyle = Theme.of(context).textTheme;
+
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(title, style: textStyle.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 15),
+            ...details,
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _DetailRow extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color color;
+
+  const _DetailRow({
+    required this.icon,
+    required this.label,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final textStyle = Theme.of(context).textTheme;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        children: [
+          CircleAvatar(
+            backgroundColor: color.withOpacity(0.2),
+            child: Icon(icon, color: color),
+          ),
+          const SizedBox(width: 10),
+          Text(label, style: textStyle.bodyLarge),
+        ],
+      ),
+    );
+  }
+}
+
+class _DescriptionCard extends StatelessWidget {
+  final String title;
+  final String description;
+  final TextTheme textStyle;
+
+  const _DescriptionCard({
+    required this.title,
+    required this.description,
+    required this.textStyle,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(title, style: textStyle.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+            const SizedBox(
+              height: 10,
+              width: double.infinity,
+              ),
+            Text(description, style: textStyle.bodyLarge),
+          ],
+        ),
       ),
     );
   }

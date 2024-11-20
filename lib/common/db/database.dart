@@ -128,7 +128,7 @@ Future<void> insertHospitalActivities(AppDatabase db) async {
         title: Value("Consulta Médica $activityId"),
         subtitle: Value("Consulta de seguimiento $activityId"),
         patientName: Value("Paciente $activityId"),
-        description: Value("Descripción de la consulta médica $activityId."),
+        description: Value("Nulla voluptate do excepteur nulla sit duis Lorem exercitation enim qui occaecat. Adipisicing quis ea non aliqua. Aliquip commodo qui ad nulla proident adipisicing irure et anim culpa. Amet reprehenderit ea nisi minim pariatur qui eiusmod reprehenderit.Culpa qui Lorem nulla pariatur eiusmod nostrud et. Id ea officia et et dolor labore adipisicing qui laborum officia adipisicing anim fugiat do. Proident dolor do irure labore. Dolor tempor elit elit adipisicing ea dolore amet elit laborum. Nostrud nostrud adipisicing culpa non elit ex in. Ipsum voluptate nostrud Lorem id. Cupidatat amet culpa enim exercitation aliquip. $activityId."),
         date: Value(date),
         time: const Value("10:00 AM"),
         area: const Value("Medicina General"),

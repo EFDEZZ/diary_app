@@ -43,7 +43,6 @@ class ExportLogic {
           .map((dbActivity) => ActivityMapper.activityDbToActivity(dbActivity))
           .toList();
     } catch (e) {
-      print("Error al obtener actividades filtradas: $e");
       return [];
     }
   }
@@ -52,7 +51,6 @@ class ExportLogic {
 Future<String?> exportToVcf(List<Activity> activities) async {
   // Solicitar permisos de almacenamiento
   if (!await _requestStoragePermission()) {
-    print("Permiso de almacenamiento no concedido.");
     return null;
   }
 
@@ -93,10 +91,8 @@ Future<String?> exportToVcf(List<Activity> activities) async {
     await sink.flush();
     await sink.close();
 
-    print("Archivo exportado en: $filePath");
     return filePath;
   } catch (e) {
-    print("Error al exportar archivo .vcf: $e");
     return null;
   }
 }
@@ -119,7 +115,6 @@ DateTime _combineDateAndTime(DateTime date, String time) {
     // Combina la fecha y la hora
     return DateTime(date.year, date.month, date.day, hour, minute);
   } catch (e) {
-    print("Error al combinar fecha y hora: $e");
     return date; // Devuelve solo la fecha si hay error
   }
 }

@@ -40,7 +40,7 @@ class _HomeScreenState extends State<HomeScreen> {
           onDateRangeSelected: (dateRange) {
             setState(() {
               selectedDateRange = dateRange;
-              selectedFilter = 'Rango de fechas'; // Cambia a "Rango de fechas"
+              selectedFilter = 'Rango de fechas'; 
             });
           },
         );
@@ -48,56 +48,80 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
   void _exportActivities() async {
-    try {
-      // Obtener las actividades filtradas
-      final activities = await exportLogic.getFilteredActivities(
-        selectedFilter: selectedFilter,
-        selectedDateRange: selectedDateRange,
-      );
+  try {
+    // Obtener las actividades filtradas
+    final activities = await exportLogic.getFilteredActivities(
+      selectedFilter: selectedFilter,
+      selectedDateRange: selectedDateRange,
+    );
 
-      // Exportar a .vcf
-      final filePath = await exportLogic.exportToVcf(activities);
+    // Exportar a .vcf
+    final filePath = await exportLogic.exportToVcf(activities);
 
-      if (filePath != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Archivo exportado a: $filePath')),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Error al exportar el archivo.')),
-        );
-      }
-    } catch (e) {
+    if (!mounted) return; // Asegúrate de que el widget sigue montado
+
+    if (filePath != null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
+        SnackBar(content: Text('Archivo exportado a: $filePath')),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error al exportar el archivo.')),
       );
     }
-  }
+  } catch (e) {
+    if (!mounted) return; // Verifica que el widget sigue montado
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Planificación de $selectedFilter"),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.date_range_outlined),
-            onPressed: _showFilterDialog,
-          ),
-          IconButton(
-            icon: const Icon(Icons.file_download_outlined),
-            onPressed: _exportActivities, // Llama al método de exportar
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Error: $e')),
+    );
+  }
+}
+
+
+@override
+Widget build(BuildContext context) {
+
+  return Scaffold(
+    appBar: AppBar(
+      elevation: 4,
+      backgroundColor: const Color.fromARGB(255, 151, 200, 153),
+      title: Row(
+        children: [
+          const Icon(Icons.calendar_month_outlined, color: Colors.black87),
+          const SizedBox(width: 8),
+          Flexible(
+            child: Text(
+              selectedFilter,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1, 
+            ),
           ),
         ],
       ),
-      body: _HomeView(
-        database: widget.database,
-        filter: selectedFilter,
-        dateRange: selectedDateRange,
-        exportLogic: exportLogic,
-      ),
-    );
-  }
+      actions: [
+        IconButton(
+          tooltip: "Filtrar actividades",
+          icon: const Icon(Icons.filter_list_outlined, color: Colors.black87,),
+          onPressed: _showFilterDialog,
+        ),
+        IconButton(
+          tooltip: "Exportar actividades",
+          icon: const Icon(Icons.download_for_offline_outlined, color: Colors.black87),
+          onPressed: _exportActivities,
+        ),
+      ],
+    ),
+    body: _HomeView(
+      database: widget.database,
+      filter: selectedFilter,
+      dateRange: selectedDateRange,
+      exportLogic: exportLogic,
+    ),
+  );
+}
+
 }
 
 
@@ -164,29 +188,65 @@ class _CustomListTile extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
     final textStyle = Theme.of(context).textTheme;
 
-    return ListTile(
-      leading: Icon(Icons.calendar_today, color: colors.primary),
-      trailing: SizedBox(
-        width: 110,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(activity.time, style: textStyle.titleMedium),
-            Icon(Icons.arrow_forward_ios_rounded, color: colors.primary),
-          ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      child: Card(
+        elevation: 4,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: () {
+            context.push('/activity/${activity.id}');
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              children: [
+                CircleAvatar(
+                  backgroundColor: colors.primary.withOpacity(0.2),
+                  radius: 24, 
+                  child: Icon(Icons.event, color: colors.primary),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        activity.title,
+                        style: textStyle.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        activity.subtitle,
+                        style: textStyle.bodyMedium?.copyWith(color: Colors.grey[700]),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        "Paciente: ${activity.patientName}",
+                        style: textStyle.bodySmall?.copyWith(color: colors.secondary),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      activity.time,
+                      style: textStyle.bodySmall?.copyWith(color: const Color.fromARGB(255, 94, 94, 94)),
+                    ),
+                    const SizedBox(height: 8),
+                    Icon(Icons.arrow_forward_ios_rounded, color: colors.primary, size: 16),
+                  ],
+                ),
+              ],
+            ),
+          ),
         ),
       ),
-      title: Text(activity.title),
-      subtitle: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(activity.subtitle),
-          Text(activity.patientName),
-        ],
-      ),
-      onTap: () {
-        context.push('/activity/${activity.id}');
-      },
     );
   }
 }
+

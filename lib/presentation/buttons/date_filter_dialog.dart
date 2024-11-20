@@ -1,13 +1,14 @@
-// date_filter_dialog.dart
 import 'package:flutter/material.dart';
+import 'custom_date_range_picker.dart'; // Asegúrate de importar el CustomDateRangePicker
 
-class DateFilterDialog extends StatelessWidget {
+class DateFilterDialog extends StatefulWidget {
   final String currentFilter;
   final DateTimeRange? selectedDateRange;
   final ValueChanged<String> onFilterSelected;
   final ValueChanged<DateTimeRange?> onDateRangeSelected;
 
-  const DateFilterDialog({super.key, 
+  const DateFilterDialog({
+    super.key,
     required this.currentFilter,
     required this.selectedDateRange,
     required this.onFilterSelected,
@@ -15,57 +16,115 @@ class DateFilterDialog extends StatelessWidget {
   });
 
   @override
+  DateFilterDialogState createState() => DateFilterDialogState();
+}
+
+class DateFilterDialogState extends State<DateFilterDialog> {
+  late String temporaryFilter; // Estado temporal del filtro
+  DateTimeRange? temporaryDateRange; // Estado temporal para el rango de fechas
+
+  @override
+  void initState() {
+    super.initState();
+    temporaryFilter = widget.currentFilter; // Inicializa con el filtro actual
+    temporaryDateRange = widget.selectedDateRange; // Inicializa con el rango actual
+  }
+
+  @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Selecciona el filtro'),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      title: const Text(
+        'Selecciona el filtro',
+        style: TextStyle(fontWeight: FontWeight.bold),
+      ),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          ListTile(
-            title: const Text('Hoy'),
-            leading: Radio<String>(
-              value: 'Hoy',
-              groupValue: currentFilter,
-              onChanged: (value) {
-                onFilterSelected(value!); // Cambia el filtro a "Hoy"
-                Navigator.pop(context);
-              },
-            ),
-          ),
-          ListTile(
-            title: const Text('Semana'),
-            leading: Radio<String>(
-              value: 'Semana',
-              groupValue: currentFilter,
-              onChanged: (value) {
-                onFilterSelected(value!); // Cambia el filtro a "Semana"
-                Navigator.pop(context);
-              },
-            ),
-          ),
+          _buildFilterOption('Hoy'),
+          const Divider(),
+          _buildFilterOption('Semana'),
+          const Divider(),
           ListTile(
             title: const Text('Rango de fechas'),
             leading: Radio<String>(
               value: 'Rango de fechas',
-              groupValue: currentFilter,
+              groupValue: temporaryFilter,
               onChanged: (value) async {
-                onFilterSelected(value!); // Cambia el filtro a "Rango de fechas"
-                Navigator.pop(context);
-                // Abre el selector de fechas
-                final pickedRange = await showDateRangePicker(
+                final pickedRange = await CustomDateRangePicker.show(
                   context: context,
-                  initialDateRange: selectedDateRange,
+                  initialDateRange: temporaryDateRange,
                   firstDate: DateTime(2020),
                   lastDate: DateTime(2101),
                 );
                 if (pickedRange != null) {
-                  onDateRangeSelected(pickedRange); // Selección de fechas
+                  setState(() {
+                    temporaryFilter = 'Rango de fechas';
+                    temporaryDateRange = pickedRange;
+                  });
                 }
               },
             ),
+            trailing: temporaryDateRange != null
+                ? Text(
+                    '${temporaryDateRange!.start.day}/${temporaryDateRange!.start.month} - ${temporaryDateRange!.end.day}/${temporaryDateRange!.end.month}',
+                  )
+                : null,
+            onTap: () async {
+              final pickedRange = await CustomDateRangePicker.show(
+                context: context,
+                initialDateRange: temporaryDateRange,
+                firstDate: DateTime(2020),
+                lastDate: DateTime(2101),
+              );
+              if (pickedRange != null) {
+                setState(() {
+                  temporaryFilter = 'Rango de fechas';
+                  temporaryDateRange = pickedRange;
+                });
+              }
+            },
           ),
         ],
       ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context); // Cierra el diálogo sin aplicar cambios
+          },
+          child: const Text('Cancelar'),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            widget.onFilterSelected(temporaryFilter); // Aplica el filtro
+            if (temporaryFilter == 'Rango de fechas') {
+              widget.onDateRangeSelected(temporaryDateRange); // Aplica el rango de fechas
+            }
+            Navigator.pop(context); // Cierra el diálogo
+          },
+          child: const Text('Aceptar'),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFilterOption(String label) {
+    return ListTile(
+      title: Text(label),
+      leading: Radio<String>(
+        value: label,
+        groupValue: temporaryFilter,
+        onChanged: (value) {
+          setState(() {
+            temporaryFilter = value!;
+          });
+        },
+      ),
+      onTap: () {
+        setState(() {
+          temporaryFilter = label;
+        });
+      },
     );
   }
 }
