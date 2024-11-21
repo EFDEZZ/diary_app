@@ -13,8 +13,30 @@ class ActivityDetailsScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
+        elevation: 4,
         backgroundColor: const Color.fromARGB(255, 151, 200, 153),
-        title:  const Text("Detalles de la Cita", style: TextStyle(fontWeight: FontWeight.bold),),
+        title: const Row(
+          children: [
+            Icon(Icons.event_note, color: Color.fromARGB(255, 17, 17, 17)),
+            SizedBox(width: 8),
+            Flexible(
+              child: Text(
+                "Detalles de la Cita",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 22,
+                ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ),
+            ),
+          ],
+        ),
+        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Color.fromARGB(255, 0, 0, 0)),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
       ),
       body: _ActivityDetailView(
         activities: activities,
@@ -47,13 +69,13 @@ class _ActivityDetailView extends StatelessWidget {
             title: activities.title,
             details: [
               _DetailRow(
-                icon: Icons.text_snippet_rounded,
-                label: activities.subtitle,
+                icon: Icons.person,
+                label: "Paciente: ${activities.patientName}",
                 color: colors.primary,
               ),
               _DetailRow(
-                icon: Icons.person,
-                label: activities.patientName,
+                icon: Icons.text_snippet_rounded,
+                label: activities.subtitle,
                 color: colors.primary,
               ),
               _DetailRow(
@@ -66,6 +88,16 @@ class _ActivityDetailView extends StatelessWidget {
                 label: activities.time,
                 color: colors.primary,
               ),
+              _DetailRow(
+                icon: Icons.local_hospital_outlined,
+                label: "Área: ${activities.area}",
+                color: colors.secondary,
+              ),
+              _DetailRow(
+                icon: Icons.check_circle_outline,
+                label: "Tipo de Consulta: ${activities.consultType}",
+                color: colors.secondary,
+              ),
             ],
           ),
           const SizedBox(height: 20),
@@ -76,15 +108,14 @@ class _ActivityDetailView extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           Center(
-            child: FilledButton.tonal(
+            child: ElevatedButton.icon(
               onPressed: () {},
-              child: const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.local_hospital),
-                  SizedBox(width: 5),
-                  Text("HCE del Paciente"),
-                ],
+              icon: const Icon(Icons.local_hospital, color: Colors.white),
+              label: const Text("Ver HCE del Paciente", style: TextStyle(color: Colors.white, fontSize: 18),),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color.fromARGB(255, 121, 169, 123),
+                padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 20.0),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
             ),
           ),
@@ -111,12 +142,18 @@ class _InfoCard extends StatelessWidget {
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title, style: textStyle.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 15),
+            Text(
+              title,
+              style: textStyle.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: const Color.fromARGB(255, 50, 75, 60),
+              ),
+            ),
+            const SizedBox(height: 16),
             ...details,
           ],
         ),
@@ -141,21 +178,25 @@ class _DetailRow extends StatelessWidget {
     final textStyle = Theme.of(context).textTheme;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           CircleAvatar(
+            radius: 18,
             backgroundColor: color.withOpacity(0.2),
-            child: Icon(icon, color: color),
+            child: Icon(icon, color: color, size: 20),
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: 12),
           Expanded(
             child: Text(
               label,
-              style: textStyle.bodyLarge,
-              maxLines: 2, 
-              overflow: TextOverflow.ellipsis, 
+              style: textStyle.bodyLarge?.copyWith(
+                color: const Color.fromARGB(255, 50, 75, 60),
+                fontWeight: FontWeight.w500,
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],
@@ -163,7 +204,6 @@ class _DetailRow extends StatelessWidget {
     );
   }
 }
-
 
 class _DescriptionCard extends StatelessWidget {
   final String title;
@@ -182,16 +222,24 @@ class _DescriptionCard extends StatelessWidget {
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title, style: textStyle.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
-            const SizedBox(
-              height: 10,
-              width: double.infinity,
+            Text(
+              title,
+              style: textStyle.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: const Color.fromARGB(255, 50, 75, 60),
               ),
-            Text(description, style: textStyle.bodyLarge),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              description,
+              style: textStyle.bodyLarge?.copyWith(
+                color: const Color.fromARGB(255, 80, 80, 80),
+              ),
+            ),
           ],
         ),
       ),

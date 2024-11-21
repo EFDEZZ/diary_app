@@ -26,65 +26,98 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        elevation: 4,
-        backgroundColor: const Color.fromARGB(255, 151, 200, 153),
-        title: Row(
-          children: [
-            const Icon(Icons.calendar_month_outlined, color: Colors.black87),
-            const SizedBox(width: 8),
-            Flexible(
-              child: Text(
-                selectedFilter,
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          // Usar el botón de ordenamiento
-          OrderButton(
-            currentOrder: selectedOrder,
-            onOrderChanged: (String newOrder) {
-              setState(() {
-                selectedOrder = newOrder;
-              });
-            },
-          ),
-          // Nuevo botón para seleccionar filtros
-          DateFilterButton(
-            currentFilter: selectedFilter,
-            selectedDateRange: selectedDateRange,
-            onFilterSelected: (String newFilter) {
-              setState(() {
-                selectedFilter = newFilter;
-              });
-            },
-            onDateRangeSelected: (DateTimeRange? newRange) {
-              setState(() {
-                selectedDateRange = newRange;
-                if (newRange != null) {
-                  selectedFilter = 'Rango de fechas';
-                }
-              });
-            },
-          ),
-          // Botón para exportar actividades, utilizando el nuevo ExportLogic como botón
-          ExportButton(
-            database: widget.database,
-            selectedFilter: selectedFilter,
-            selectedDateRange: selectedDateRange,
-          ),
-        ],
-      ),
+      appBar: _buildCustomAppBar(context),
       body: _HomeView(
         database: widget.database,
         filter: selectedFilter,
         dateRange: selectedDateRange,
         orderBy: selectedOrder,
       ),
+    );
+  }
+
+  PreferredSizeWidget _buildCustomAppBar(BuildContext context) {
+    return AppBar(
+      automaticallyImplyLeading: false,
+      elevation: 0,
+      flexibleSpace: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Color.fromARGB(255, 151, 200, 153),
+              Color.fromARGB(255, 100, 150, 100),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+      ),
+      title: Row(
+        children: [
+          const Icon(
+            Icons.calendar_month_outlined,
+            color: Color.fromARGB(255, 0, 0, 0),
+            size: 30,
+          ),
+          const SizedBox(width: 8),
+          Flexible(
+            child: Text(
+              selectedFilter,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 22,
+                color: Color.fromARGB(255, 0, 0, 0),
+              ),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+            ),
+          ),
+        ],
+      ),
+      actions: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: Row(
+            children: [
+              // Usar el botón de ordenamiento
+              OrderButton(
+                currentOrder: selectedOrder,
+                onOrderChanged: (String newOrder) {
+                  setState(() {
+                    selectedOrder = newOrder;
+                  });
+                },
+              ),
+              const SizedBox(width: 6),
+              // Nuevo botón para seleccionar filtros
+              DateFilterButton(
+                currentFilter: selectedFilter,
+                selectedDateRange: selectedDateRange,
+                onFilterSelected: (String newFilter) {
+                  setState(() {
+                    selectedFilter = newFilter;
+                  });
+                },
+                onDateRangeSelected: (DateTimeRange? newRange) {
+                  setState(() {
+                    selectedDateRange = newRange;
+                    if (newRange != null) {
+                      selectedFilter = 'Rango de fechas';
+                    }
+                  });
+                },
+              ),
+              const SizedBox(width: 6),
+              // Botón para exportar actividades, utilizando el nuevo ExportLogic como botón
+              ExportButton(
+                database: widget.database,
+                selectedFilter: selectedFilter,
+                selectedDateRange: selectedDateRange,
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

@@ -89,7 +89,7 @@ class DateFilterButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      icon: const Icon(Icons.filter_list, size: 20, color: Colors.black54),
+      icon: const Icon(Icons.date_range_outlined, size: 20, color: Color.fromARGB(255, 0, 0, 0)),
       tooltip: 'Filtrar actividades',
       onPressed: () {
         _showFilterOptions(context);

@@ -172,11 +172,8 @@ class ExportButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return IconButton(
       tooltip: "Exportar actividades",
-      icon: Icon(
-        Icons.download_for_offline,
-        color: Theme.of(context).primaryColorDark,
-        size: 24,
-      ),
+      icon: const Icon(Icons.file_download_outlined),
+      color: Colors.black,
       onPressed: () {
         _exportActivities(context);
       },
