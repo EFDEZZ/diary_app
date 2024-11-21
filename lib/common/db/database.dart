@@ -106,11 +106,30 @@ Future<List<ActivityDB>> getAllActivitiesThisWeek() async {
 
 
   //Obtener actividades en un rango de fecha
-  Future<List<ActivityDB>> getActivitiesInRange(DateTime start, DateTime end) {
+Future<List<ActivityDB>> getActivitiesInRange(DateTime start, DateTime end) {
   return (select(activityDb)
-        ..where((tbl) => tbl.date.isBetweenValues(start, end)))
+        ..where((tbl) => tbl.date.isBetweenValues(start, end))
+        ..orderBy([
+          // Primero ordenar por fecha (campo date)
+          (tbl) => OrderingTerm(expression: tbl.date, mode: OrderingMode.asc),
+          // Luego ordenar por hora (campo time convertido a un formato adecuado)
+          (tbl) => OrderingTerm(
+                expression: const CustomExpression<String>(
+                  """
+                  CASE
+                    WHEN SUBSTR(time, -2) = 'AM' AND SUBSTR(time, 1, 2) = '12' THEN '00:' || SUBSTR(time, 4, 2)
+                    WHEN SUBSTR(time, -2) = 'AM' THEN SUBSTR('0' || SUBSTR(time, 1, INSTR(time, ':') - 1), -2) || ':' || SUBSTR(time, INSTR(time, ':') + 1, 2)
+                    WHEN SUBSTR(time, -2) = 'PM' AND SUBSTR(time, 1, 2) = '12' THEN '12:' || SUBSTR(time, 4, 2)
+                    ELSE CAST((CAST(SUBSTR(time, 1, INSTR(time, ':') - 1) AS INTEGER) + 12) AS TEXT) || ':' || SUBSTR(time, INSTR(time, ':') + 1, 2)
+                  END
+                  """
+                ),
+                mode: OrderingMode.asc,
+              ),
+        ]))
       .get();
 }
+
 
   //Obtener detalles de una actividad
   Future<ActivityDB?> getActivityById(String id) {
