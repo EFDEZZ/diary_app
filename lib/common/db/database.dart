@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 import 'package:diary_app/infrastructure/models/activity_db.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
@@ -29,29 +30,80 @@ class ActivityDao extends DatabaseAccessor<AppDatabase> with _$ActivityDaoMixin 
 
   ActivityDao(this.db) : super(db);
 
+  // Comprobar si la base de datos ya tiene actividades
+  Future<bool> hasActivities() async {
+    final count = await (select(activityDb)..limit(1)).get();
+    return count.isNotEmpty;
+  }
+
+  // Insertar actividades solo si la base de datos está vacía
+  Future<void> insertInitialActivities(List<ActivityDbCompanion> activities) async {
+    final hasData = await hasActivities();
+    if (!hasData) {
+      for (final activity in activities) {
+        await into(activityDb).insert(activity);
+      }
+    } 
+  }
+
   //Obtener Actividades del dia actual
-  Future<List<ActivityDB>> getAllActivitiesToday() {
+Future<List<ActivityDB>> getAllActivitiesToday() {
   final today = DateTime.now();
   final startOfDay = DateTime(today.year, today.month, today.day);
   final endOfDay = DateTime(today.year, today.month, today.day, 23, 59, 59);
 
   return (select(activityDb)
         ..where((activity) =>
-            activity.date.isBetweenValues(startOfDay, endOfDay)))
+            activity.date.isBetweenValues(startOfDay, endOfDay))
+        ..orderBy([
+          // Usar SQL personalizado para convertir y ordenar por tiempo (AM/PM)
+          (activity) => OrderingTerm(
+                expression: const CustomExpression<String>(
+                  """
+                  CASE
+                    WHEN SUBSTR(time, -2) = 'AM' AND SUBSTR(time, 1, 2) = '12' THEN '00:' || SUBSTR(time, 4, 2)
+                    WHEN SUBSTR(time, -2) = 'AM' THEN SUBSTR('0' || SUBSTR(time, 1, INSTR(time, ':') - 1), -2) || ':' || SUBSTR(time, INSTR(time, ':') + 1, 2)
+                    WHEN SUBSTR(time, -2) = 'PM' AND SUBSTR(time, 1, 2) = '12' THEN '12:' || SUBSTR(time, 4, 2)
+                    ELSE CAST((CAST(SUBSTR(time, 1, INSTR(time, ':') - 1) AS INTEGER) + 12) AS TEXT) || ':' || SUBSTR(time, INSTR(time, ':') + 1, 2)
+                  END
+                  """
+                ),
+                mode: OrderingMode.asc,
+              ),
+        ]))
       .get();
 }
 
+
   //Obtener actividades de la semana 
 Future<List<ActivityDB>> getAllActivitiesThisWeek() async {
-
   final now = DateTime.now();
   final monday = now.subtract(Duration(days: now.weekday - DateTime.monday));
   final sunday = monday.add(const Duration(days: 6));
 
   return (select(activityDb)
-        ..where((tbl) => tbl.date.isBetweenValues(monday, sunday)))
+        ..where((tbl) => tbl.date.isBetweenValues(monday, sunday))
+        ..orderBy([
+          // Ordenar primero por día (campo date)
+          (tbl) => OrderingTerm(expression: tbl.date, mode: OrderingMode.asc),
+          // Ordenar luego por hora (campo time convertido a 24 horas)
+          (tbl) => OrderingTerm(
+                expression: const CustomExpression<String>(
+                  """
+                  CASE
+                    WHEN SUBSTR(time, -2) = 'AM' AND SUBSTR(time, 1, 2) = '12' THEN '00:' || SUBSTR(time, 4, 2)
+                    WHEN SUBSTR(time, -2) = 'AM' THEN SUBSTR('0' || SUBSTR(time, 1, INSTR(time, ':') - 1), -2) || ':' || SUBSTR(time, INSTR(time, ':') + 1, 2)
+                    WHEN SUBSTR(time, -2) = 'PM' AND SUBSTR(time, 1, 2) = '12' THEN '12:' || SUBSTR(time, 4, 2)
+                    ELSE CAST((CAST(SUBSTR(time, 1, INSTR(time, ':') - 1) AS INTEGER) + 12) AS TEXT) || ':' || SUBSTR(time, INSTR(time, ':') + 1, 2)
+                  END
+                  """
+                ),
+                mode: OrderingMode.asc,
+              ),
+        ]))
       .get();
 }
+
 
   //Obtener actividades en un rango de fecha
   Future<List<ActivityDB>> getActivitiesInRange(DateTime start, DateTime end) {
@@ -64,46 +116,6 @@ Future<List<ActivityDB>> getAllActivitiesThisWeek() async {
   Future<ActivityDB?> getActivityById(String id) {
     return (select(activityDb)..where((tbl) => tbl.id.equals(id))).getSingleOrNull();
   }
-
-  //Exportar planifiacion a vcf
-//   Future<void> exportToVcf(List<ActivityDB> activities) async {
-//   final StringBuffer vcfContent = StringBuffer();
-//   vcfContent.writeln('BEGIN:VCALENDAR');
-//   vcfContent.writeln('VERSION:2.0');
-
-//   for (final activity in activities) {
-//     vcfContent.writeln('BEGIN:VEVENT');
-//     vcfContent.writeln('SUMMARY:${activity.title}');
-//     vcfContent.writeln('DESCRIPTION:${activity.description}');
-//     vcfContent.writeln('DTSTART:${_formatDateToVcf(activity.date, activity.time)}');
-//     vcfContent.writeln('DTEND:${_formatDateToVcf(activity.date, activity.time, durationMinutes: 60)}');
-//     vcfContent.writeln('LOCATION:${activity.area}');
-//     vcfContent.writeln('END:VEVENT');
-//   }
-
-//   vcfContent.writeln('END:VCALENDAR');
-
-//   // Guardar el archivo en el almacenamiento local
-//   final directory = await getApplicationDocumentsDirectory();
-//   final filePath = '${directory.path}/planificacion.vcf';
-//   final file = File(filePath);
-//   await file.writeAsString(vcfContent.toString());
-
-//   // Compartir el archivo utilizando SharePlus
-//   Share.shareXFiles([XFile(filePath)], text: 'Planificación en formato .vcf');
-// }
-
-// String _formatDateToVcf(DateTime date, String time, {int durationMinutes = 0}) {
-//   final DateTime dateTime = DateTime(
-//     date.year,
-//     date.month,
-//     date.day,
-//     int.parse(time.split(':')[0]),
-//     int.parse(time.split(':')[1]),
-//   ).add(Duration(minutes: durationMinutes));
-
-//   return '${dateTime.toUtc().toIso8601String().replaceAll('-', '').replaceAll(':', '').split('.')[0]}Z';
-// }
 }
 
 
@@ -115,29 +127,87 @@ Future<List<ActivityDB>> getAllActivitiesThisWeek() async {
 
 //Insertar datosssssssssssss
 Future<void> insertHospitalActivities(AppDatabase db) async {
-  int activityId = 7;
+  final activities = <ActivityDbCompanion>[];
+  int activityId = 1;
   final DateTime startDate = DateTime(2024, 11, 15);
   final DateTime endDate = DateTime(2024, 12, 10);
   final int daysCount = endDate.difference(startDate).inDays + 1;
 
+  final List<String> titles = [
+    "Consulta Médica",
+    "Consulta Cardiológica",
+    "Consulta Neurológica",
+    "Chequeo General",
+    "Consulta Pediátrica",
+    "Control Prenatal",
+  ];
+
+  final List<String> areas = [
+    "Medicina General",
+    "Cardiología",
+    "Neurología",
+    "Pediatría",
+    "Ginecología",
+    "Dermatología",
+  ];
+
+  final List<String> consultTypes = ["Presencial", "Virtual"];
+  final Random random = Random();
+
+  // Horarios disponibles para cada día (de 8:00 AM a 5:00 PM, intervalos de 1 hora)
+  final List<String> availableTimes = [
+    "08:00 AM",
+    "09:00 AM",
+    "10:00 AM",
+    "11:00 AM",
+    "12:00 PM",
+    "01:00 PM",
+    "02:00 PM",
+    "03:00 PM",
+    "04:00 PM",
+    "05:00 PM",
+  ];
+
   for (int i = 0; i < daysCount; i++) {
     final date = startDate.add(Duration(days: i));
-    for (int j = 0; j < 3; j++) {
-      await db.into(db.activityDb).insert(ActivityDbCompanion(
+    final List<String> timesForDay = List.from(availableTimes); // Copia de horarios disponibles para el día
+
+    for (int j = 0; j < 5; j++) {
+      if (timesForDay.isEmpty) {
+        break; // No hay más horarios disponibles para el día
+      }
+
+      // Seleccionar un horario aleatorio del listado disponible
+      final int timeIndex = random.nextInt(timesForDay.length);
+      final String time = timesForDay.removeAt(timeIndex); // Remover el horario seleccionado para evitar repeticiones
+
+      final titleIndex = random.nextInt(titles.length);
+      final areaIndex = random.nextInt(areas.length);
+      final consultTypeIndex = random.nextInt(consultTypes.length);
+
+      final activity = ActivityDbCompanion(
         id: Value(activityId.toString()),
-        title: Value("Consulta Médica $activityId"),
-        subtitle: Value("Consulta de seguimiento $activityId"),
-        patientName: Value("Paciente $activityId"),
-        description: Value("Nulla voluptate do excepteur nulla sit duis Lorem exercitation enim qui occaecat. Adipisicing quis ea non aliqua. Aliquip commodo qui ad nulla proident adipisicing irure et anim culpa. Amet reprehenderit ea nisi minim pariatur qui eiusmod reprehenderit.Culpa qui Lorem nulla pariatur eiusmod nostrud et. Id ea officia et et dolor labore adipisicing qui laborum officia adipisicing anim fugiat do. Proident dolor do irure labore. Dolor tempor elit elit adipisicing ea dolore amet elit laborum. Nostrud nostrud adipisicing culpa non elit ex in. Ipsum voluptate nostrud Lorem id. Cupidatat amet culpa enim exercitation aliquip. $activityId."),
+        title: Value("${titles[titleIndex]} $activityId"),
+        subtitle: Value("Seguimiento ${titles[titleIndex]} $activityId"),
+        patientName: Value("Paciente ${activityId + random.nextInt(100)}"),
+        description: Value(
+          "Descripción detallada de la ${titles[titleIndex]} realizada para el paciente con ID $activityId. Incluye detalles específicos para la fecha $date."),
         date: Value(date),
-        time: const Value("10:00 AM"),
-        area: const Value("Medicina General"),
-        consultType: const Value("Presencial"),
-      ));
+        time: Value(time),
+        area: Value(areas[areaIndex]),
+        consultType: Value(consultTypes[consultTypeIndex]),
+      );
+
+      activities.add(activity);
       activityId++;
     }
   }
+
+  await db.activityDao.insertInitialActivities(activities);
 }
+
+
+
 
 
 

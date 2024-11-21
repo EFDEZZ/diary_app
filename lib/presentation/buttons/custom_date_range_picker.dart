@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:flutter/material.dart';
+
 class CustomDateRangePicker extends StatefulWidget {
   final DateTimeRange? initialDateRange;
   final DateTime firstDate;
@@ -81,10 +83,18 @@ class _CustomDateRangePickerState extends State<CustomDateRangePicker> {
                     );
                     if (picked != null) {
                       setState(() {
-                        temporaryRange = DateTimeRange(
-                          start: picked,
-                          end: temporaryRange.end,
-                        );
+                        // Asegurarse de que la fecha de fin es mayor o igual a la fecha de inicio
+                        if (picked.isAfter(temporaryRange.end)) {
+                          temporaryRange = DateTimeRange(
+                            start: picked,
+                            end: picked,
+                          );
+                        } else {
+                          temporaryRange = DateTimeRange(
+                            start: picked,
+                            end: temporaryRange.end,
+                          );
+                        }
                       });
                     }
                   },
@@ -101,10 +111,18 @@ class _CustomDateRangePickerState extends State<CustomDateRangePicker> {
                     );
                     if (picked != null) {
                       setState(() {
-                        temporaryRange = DateTimeRange(
-                          start: temporaryRange.start,
-                          end: picked,
-                        );
+                        // Asegurarse de que la fecha de inicio es menor o igual a la fecha de fin
+                        if (picked.isBefore(temporaryRange.start)) {
+                          temporaryRange = DateTimeRange(
+                            start: picked,
+                            end: picked,
+                          );
+                        } else {
+                          temporaryRange = DateTimeRange(
+                            start: temporaryRange.start,
+                            end: picked,
+                          );
+                        }
                       });
                     }
                   },
@@ -125,7 +143,6 @@ class _CustomDateRangePickerState extends State<CustomDateRangePicker> {
                   onPressed: () {
                     Navigator.pop(context, temporaryRange); // Devuelve el rango seleccionado
                   },
-                  
                   child: const Text('Aceptar'),
                 ),
               ],
@@ -176,3 +193,4 @@ class _DateSelector extends StatelessWidget {
     );
   }
 }
+
