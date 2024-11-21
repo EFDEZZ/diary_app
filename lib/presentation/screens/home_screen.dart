@@ -108,7 +108,7 @@ Widget build(BuildContext context) {
         ),
         IconButton(
           tooltip: "Exportar actividades",
-          icon: const Icon(Icons.download_for_offline_outlined, color: Colors.black87),
+          icon: const Icon(Icons.file_download_outlined, color: Colors.black87),
           onPressed: _exportActivities,
         ),
       ],
@@ -188,57 +188,105 @@ class _CustomListTile extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
     final textStyle = Theme.of(context).textTheme;
 
+    // Obtener el día de la semana y la fecha de la actividad
+    final dayOfWeek = _getDayOfWeek(activity.date);
+    final dayOfMonth = "${activity.date.day}";
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: Card(
-        elevation: 4,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        elevation: 6,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         child: InkWell(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
           onTap: () {
             context.push('/activity/${activity.id}');
           },
           child: Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 12.0),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
+                // Icono principal de la actividad
                 CircleAvatar(
-                  backgroundColor: colors.primary.withOpacity(0.2),
-                  radius: 24, 
-                  child: Icon(Icons.event, color: colors.primary),
+                  backgroundColor: colors.primary.withOpacity(0.1),
+                  radius: 30,
+                  child: Icon(
+                    Icons.event,
+                    color: colors.primary,
+                    size: 28,
+                  ),
                 ),
                 const SizedBox(width: 16),
+                // Información principal de la actividad
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // Título de la actividad (máximo una línea)
                       Text(
                         activity.title,
-                        style: textStyle.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                        style: textStyle.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 4),
+                      // Subtítulo de la actividad
                       Text(
                         activity.subtitle,
-                        style: textStyle.bodyMedium?.copyWith(color: Colors.grey[700]),
+                        style: textStyle.bodyMedium?.copyWith(
+                          color: Colors.grey[600],
+                          fontStyle: FontStyle.italic,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 8),
+                      // Nombre del paciente
                       Text(
                         "Paciente: ${activity.patientName}",
-                        style: textStyle.bodySmall?.copyWith(color: colors.secondary),
+                        style: textStyle.bodySmall?.copyWith(
+                          color: colors.secondary,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 16),
+                // Sección de fecha y hora
                 Column(
                   mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
+                    // Día y Fecha
+                    Text(
+                      "$dayOfWeek, $dayOfMonth",
+                      style: textStyle.bodySmall?.copyWith(
+                        color: const Color.fromARGB(255, 94, 94, 94),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    // Hora de la actividad
                     Text(
                       activity.time,
-                      style: textStyle.bodySmall?.copyWith(color: const Color.fromARGB(255, 94, 94, 94)),
+                      style: textStyle.bodySmall?.copyWith(
+                        color: colors.primary,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
                     ),
                     const SizedBox(height: 8),
-                    Icon(Icons.arrow_forward_ios_rounded, color: colors.primary, size: 16),
+                    // Flecha indicando más detalles
+                    Icon(
+                      Icons.arrow_forward_ios_rounded,
+                      color: colors.primary,
+                      size: 16,
+                    ),
                   ],
                 ),
               ],
@@ -248,5 +296,17 @@ class _CustomListTile extends StatelessWidget {
       ),
     );
   }
-}
 
+  String _getDayOfWeek(DateTime date) {
+    const daysOfWeek = [
+      'Domingo',
+      'Lunes',
+      'Martes',
+      'Miércoles',
+      'Jueves',
+      'Viernes',
+      'Sábado'
+    ];
+    return daysOfWeek[date.weekday % 7];
+  }
+}

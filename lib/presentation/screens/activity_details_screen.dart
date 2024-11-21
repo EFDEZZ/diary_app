@@ -143,18 +143,27 @@ class _DetailRow extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           CircleAvatar(
             backgroundColor: color.withOpacity(0.2),
             child: Icon(icon, color: color),
           ),
           const SizedBox(width: 10),
-          Text(label, style: textStyle.bodyLarge),
+          Expanded(
+            child: Text(
+              label,
+              style: textStyle.bodyLarge,
+              maxLines: 2, 
+              overflow: TextOverflow.ellipsis, 
+            ),
+          ),
         ],
       ),
     );
   }
 }
+
 
 class _DescriptionCard extends StatelessWidget {
   final String title;
