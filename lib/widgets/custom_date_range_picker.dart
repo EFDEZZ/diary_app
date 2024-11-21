@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:flutter/material.dart';
-
 class CustomDateRangePicker extends StatefulWidget {
   final DateTimeRange? initialDateRange;
   final DateTime firstDate;
@@ -54,20 +52,24 @@ class _CustomDateRangePickerState extends State<CustomDateRangePicker> {
 
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
+      child: Container(
+        padding: const EdgeInsets.all(20.0),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
               'Selecciona un rango de fechas',
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 20,
                 fontWeight: FontWeight.bold,
                 color: colors.primary,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -83,7 +85,6 @@ class _CustomDateRangePickerState extends State<CustomDateRangePicker> {
                     );
                     if (picked != null) {
                       setState(() {
-                        // Asegurarse de que la fecha de fin es mayor o igual a la fecha de inicio
                         if (picked.isAfter(temporaryRange.end)) {
                           temporaryRange = DateTimeRange(
                             start: picked,
@@ -111,7 +112,6 @@ class _CustomDateRangePickerState extends State<CustomDateRangePicker> {
                     );
                     if (picked != null) {
                       setState(() {
-                        // Asegurarse de que la fecha de inicio es menor o igual a la fecha de fin
                         if (picked.isBefore(temporaryRange.start)) {
                           temporaryRange = DateTimeRange(
                             start: picked,
@@ -129,7 +129,7 @@ class _CustomDateRangePickerState extends State<CustomDateRangePicker> {
                 ),
               ],
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 30),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -137,9 +137,21 @@ class _CustomDateRangePickerState extends State<CustomDateRangePicker> {
                   onPressed: () {
                     Navigator.pop(context); // Cierra el diálogo sin devolver nada
                   },
-                  child: const Text('Cancelar'),
+                  child: const Text(
+                    'Cancelar',
+                    style: TextStyle(fontSize: 16, color: Colors.black54),
+                  ),
                 ),
                 ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: colors.primary,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
                   onPressed: () {
                     Navigator.pop(context, temporaryRange); // Devuelve el rango seleccionado
                   },
@@ -174,18 +186,29 @@ class _DateSelector extends StatelessWidget {
         children: [
           Text(
             label,
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 8),
           Container(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 14),
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey),
-              borderRadius: BorderRadius.circular(8),
+              color: Colors.grey.shade100,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.grey.shade300),
             ),
-            child: Text(
-              '${date.day}/${date.month}/${date.year}',
-              style: const TextStyle(fontSize: 16),
+            child: Row(
+              children: [
+                const Icon(
+                  Icons.calendar_today,
+                  color: Colors.grey,
+                  size: 20,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  '${date.day}/${date.month}/${date.year}',
+                  style: const TextStyle(fontSize: 16),
+                ),
+              ],
             ),
           ),
         ],
@@ -193,4 +216,3 @@ class _DateSelector extends StatelessWidget {
     );
   }
 }
-
