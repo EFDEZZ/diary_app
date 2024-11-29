@@ -56,7 +56,6 @@ Future<List<ActivityDB>> getAllActivitiesToday() {
         ..where((activity) =>
             activity.date.isBetweenValues(startOfDay, endOfDay))
         ..orderBy([
-          // Usar SQL personalizado para convertir y ordenar por tiempo (AM/PM)
           (activity) => OrderingTerm(
                 expression: const CustomExpression<String>(
                   """
