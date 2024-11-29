@@ -1,5 +1,5 @@
 import 'package:diary_app/presentation/buttons/date_filter_button.dart';
-import 'package:diary_app/presentation/buttons/export_button.dart'; // Importación del nuevo ExportLogic
+import 'package:diary_app/presentation/buttons/export_button.dart';
 import 'package:diary_app/presentation/buttons/order_button.dart';
 import 'package:flutter/material.dart';
 import 'package:diary_app/common/db/database.dart';
@@ -20,7 +20,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String selectedFilter = 'Hoy';
-  String selectedOrder = 'Ninguno'; // Orden predeterminado
+  String selectedOrder = 'Ninguno';
   DateTimeRange? selectedDateRange;
 
   @override
@@ -79,7 +79,6 @@ class _HomeScreenState extends State<HomeScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           child: Row(
             children: [
-              // Usar el botón de ordenamiento
               OrderButton(
                 currentOrder: selectedOrder,
                 onOrderChanged: (String newOrder) {
@@ -89,7 +88,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
               ),
               const SizedBox(width: 6),
-              // Nuevo botón para seleccionar filtros
               DateFilterButton(
                 currentFilter: selectedFilter,
                 selectedDateRange: selectedDateRange,
@@ -108,7 +106,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
               ),
               const SizedBox(width: 6),
-              // Botón para exportar actividades, utilizando el nuevo ExportLogic como botón
               ExportButton(
                 database: widget.database,
                 selectedFilter: selectedFilter,
@@ -163,43 +160,32 @@ class _HomeView extends StatelessWidget {
               .map((dbData) => ActivityMapper.activityDbToActivity(dbData))
               .toList();
 
-          // Ordenar según el criterio seleccionado
           if (orderBy == 'Tipo de Consulta') {
-            activities.sort((a, b) {
-              int typeCompare = a.consultType.compareTo(b.consultType);
-              if (typeCompare != 0) return typeCompare;
-
-              int dateCompare = a.date.compareTo(b.date);
-              if (dateCompare != 0) return dateCompare;
-
-              return _compareTime(a.time, b.time);
-            });
+            return groupedListView(
+              context,
+              activities,
+              (Activity a) => a.consultType,
+            );
           } else if (orderBy == 'Área') {
-            activities.sort((a, b) {
-              int areaCompare = a.area.compareTo(b.area);
-              if (areaCompare != 0) return areaCompare;
-
-              int dateCompare = a.date.compareTo(b.date);
-              if (dateCompare != 0) return dateCompare;
-
-              return _compareTime(a.time, b.time);
-            });
+            return groupedListView(
+              context,
+              activities,
+              (Activity a) => a.area,
+            );
           } else {
             activities.sort((a, b) {
               int dateCompare = a.date.compareTo(b.date);
               if (dateCompare != 0) return dateCompare;
-
               return _compareTime(a.time, b.time);
             });
+            return ListView.builder(
+              itemCount: activities.length,
+              itemBuilder: (context, index) {
+                final activity = activities[index];
+                return CustomListTile(activity: activity);
+              },
+            );
           }
-
-          return ListView.builder(
-            itemCount: activities.length,
-            itemBuilder: (context, index) {
-              final activity = activities[index];
-              return CustomListTile(activity: activity);
-            },
-          );
         }
       },
     );
