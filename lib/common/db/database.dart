@@ -78,7 +78,8 @@ Future<List<ActivityDB>> getAllActivitiesToday() {
   //Obtener actividades de la semana 
 Future<List<ActivityDB>> getAllActivitiesThisWeek() async {
   final now = DateTime.now();
-  final monday = now.subtract(Duration(days: now.weekday - DateTime.monday));
+  final monday = DateTime(now.year, now.month, now.day).subtract(Duration(days: now.weekday - 1));
+
   final sunday = monday.add(const Duration(days: 6));
 
   return (select(activityDb)
