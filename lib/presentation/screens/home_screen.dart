@@ -174,6 +174,13 @@ class _HomeView extends StatelessWidget {
               (Activity a) => a.area,
               'Área',
             );
+          } else if (filter == 'Semana' || filter == 'Rango de fechas') {
+            return _buildGroupedListView(
+              context,
+              activities,
+              (Activity a) => DateFormat('EEEE', 'es').format(a.date),
+              '',
+            );
           } else {
             activities.sort((a, b) {
               int dateCompare = a.date.compareTo(b.date);
@@ -193,99 +200,96 @@ class _HomeView extends StatelessWidget {
     );
   }
 
-Widget _buildGroupedListView(
-  BuildContext context,
-  List<Activity> activities,
-  String Function(Activity) groupBy,
-  String groupType,
-) {
-  Map<String, List<Activity>> groupedActivities = {};
-
-  for (var activity in activities) {
-    final groupKey = groupBy(activity);
-    groupedActivities.putIfAbsent(groupKey, () => []).add(activity);
-  }
-
-  List<Widget> groupedWidgets = [];
-  groupedActivities.forEach((key, activities) {
-    groupedWidgets.add(
-      Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 16.0),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                // Divider izquierdo
-                Expanded(
-                  child: Container(
-                    margin: const EdgeInsets.only(right: 10.0),
-                    child: Divider(
-                      thickness: 2.0,
-                      color: Colors.teal.shade200.withOpacity(0.7),
-                      endIndent: 8.0,
-                      indent: 4.0,
-                    ),
-                  ),
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      groupType,
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.teal.shade900,
-                          ),
-                    ),
-                    const SizedBox(height: 3.0),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.teal.shade50,
-                        borderRadius: BorderRadius.circular(12.0),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 6.0, horizontal: 10.0),
-                      child: Text(
-                        key,
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.teal.shade700,
-                            ),
-                        softWrap: true,
-                      ),
-                    ),
-                  ],
-                ),
-                // Divider derecho
-                Expanded(
-                  child: Container(
-                    margin: const EdgeInsets.only(left: 10.0),
-                    child: Divider(
-                      thickness: 2.0,
-                      color: Colors.teal.shade200.withOpacity(0.7),
-                      indent: 8.0,
-                      endIndent: 4.0,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
+  Widget _buildGroupedListView(
+    BuildContext context,
+    List<Activity> activities,
+    String Function(Activity) groupBy,
+    String groupType,
+  ) {
+    Map<String, List<Activity>> groupedActivities = {};
 
     for (var activity in activities) {
-      groupedWidgets.add(CustomListTile(activity: activity));
+      final groupKey = groupBy(activity);
+      groupedActivities.putIfAbsent(groupKey, () => []).add(activity);
     }
-  });
 
-  groupedWidgets.add(const SizedBox(height: 40));
+    List<Widget> groupedWidgets = [];
+    groupedActivities.forEach((key, activities) {
+      groupedWidgets.add(
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 16.0),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  // Divider izquierdo
+                  Expanded(
+                    child: Container(
+                      margin: const EdgeInsets.only(right: 10.0),
+                      child: Divider(
+                        thickness: 2.0,
+                        color: Colors.teal.shade200.withOpacity(0.7),
+                        endIndent: 8.0,
+                        indent: 4.0,
+                      ),
+                    ),
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      if (groupType.isNotEmpty)
+                        Text(
+                          groupType,
+                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.teal.shade900,
+                              ),
+                        ),
+                      const SizedBox(height: 3.0),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.teal.shade50,
+                          borderRadius: BorderRadius.circular(12.0),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 6.0, horizontal: 10.0),
+                        child: Text(
+                          key,
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.teal.shade700,
+                              ),
+                          softWrap: true,
+                        ),
+                      ),
+                    ],
+                  ),
+                  // Divider derecho
+                  Expanded(
+                    child: Container(
+                      margin: const EdgeInsets.only(left: 10.0),
+                      child: Divider(
+                        thickness: 2.0,
+                        color: Colors.teal.shade200.withOpacity(0.7),
+                        indent: 8.0,
+                        endIndent: 4.0,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      );
 
-  return ListView(children: groupedWidgets);
-}
+      for (var activity in activities) {
+        groupedWidgets.add(CustomListTile(activity: activity));
+      }
+    });
 
-
+    return ListView(children: groupedWidgets);
+  }
 
   int _compareTime(String timeA, String timeB) {
     final timeFormat = DateFormat('hh:mm a');
