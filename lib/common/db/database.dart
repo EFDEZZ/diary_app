@@ -153,12 +153,15 @@ Future<void> insertHospitalActivities(AppDatabase db) async {
   final int daysCount = endDate.difference(startDate).inDays + 1;
 
   final List<String> titles = [
-    "Consulta Médica",
-    "Consulta Cardiológica",
-    "Consulta Neurológica",
-    "Chequeo General",
-    "Consulta Pediátrica",
-    "Control Prenatal",
+    "Consulta General",
+    "Consulta Especializada",
+    "Consulta de Urgencias",
+    "Consulta de Procedimientos",
+    "Consulta de Control",
+    "Consulta de Interconsultas",
+    "Consulta de Salud Preventiva",
+    "Consulta de Exámenes Complementarios",
+    "Consulta Administrativa",
   ];
 
   final List<String> areas = [
@@ -168,9 +171,24 @@ Future<void> insertHospitalActivities(AppDatabase db) async {
     "Pediatría",
     "Ginecología",
     "Dermatología",
+    "Oftalmología",
+    "Laboratorio Clínico",
+    "Radiología",
   ];
 
-  final List<String> consultTypes = ["Presencial", "Virtual"];
+  // Actualización de consultTypes
+  final List<String> consultTypes = [
+    "General",
+    "Especializada",
+    "Urgencias",
+    "Procedimientos",
+    "Control",
+    "Interconsultas",
+    "Preventiva",
+    "Exámenes Complementarios",
+    "Administrativa",
+  ];
+
   final Random random = Random();
 
   // Horarios disponibles para cada día (de 8:00 AM a 5:00 PM, intervalos de 1 hora)
