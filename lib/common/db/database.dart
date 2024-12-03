@@ -209,7 +209,7 @@ Future<void> insertHospitalActivities(AppDatabase db) async {
     final date = startDate.add(Duration(days: i));
     final List<String> timesForDay = List.from(availableTimes); // Copia de horarios disponibles para el día
 
-    for (int j = 0; j < 5; j++) {
+    for (int j = 0; j < 3; j++) {
       if (timesForDay.isEmpty) {
         break; // No hay más horarios disponibles para el día
       }

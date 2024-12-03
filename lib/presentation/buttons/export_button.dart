@@ -19,11 +19,21 @@ class ExportButton extends StatelessWidget {
 
   /// Solicitar permisos de almacenamiento
   Future<bool> _requestStoragePermission() async {
-    if (await Permission.manageExternalStorage.request().isGranted) {
-      return true;
-    } else {
+    // A partir de Android 13, los permisos de almacenamiento cambiaron.
+    if (Platform.isAndroid) {
+      if (await Permission.storage.isGranted ||
+          await Permission.manageExternalStorage.isGranted) {
+        return true;
+      }
+      
+      if (await Permission.storage.request().isGranted ||
+          await Permission.manageExternalStorage.request().isGranted) {
+        return true;
+      }
+
       return false;
     }
+    return true;
   }
 
   /// Obtener actividades filtradas según el filtro seleccionado
@@ -35,8 +45,7 @@ class ExportButton extends StatelessWidget {
         activitiesDB = await database.activityDao.getAllActivitiesToday();
       } else if (selectedFilter == 'Semana') {
         activitiesDB = await database.activityDao.getAllActivitiesThisWeek();
-      } else if (selectedFilter == 'Rango de fechas' &&
-          selectedDateRange != null) {
+      } else if (selectedFilter == 'Rango de fechas' && selectedDateRange != null) {
         activitiesDB = await database.activityDao.getActivitiesInRange(
           selectedDateRange!.start,
           selectedDateRange!.end,
